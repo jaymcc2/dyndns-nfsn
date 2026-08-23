@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block body %}
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="column is-half is-offset-one-quarter">
+      <div class="box">
+        <h1 class="title">Admin Login</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="notification is-danger">
+              {% for message in messages %}
+                <p>{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <form method="post" action="{{ url_for('login_post') }}">
+          <input type="hidden" name="next" value="{{ next_url }}">
+          <div class="field">
+            <label class="label">Username</label>
+            <div class="control">
+              <input class="input" type="text" name="username" required autofocus>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Password</label>
+            <div class="control">
+              <input class="input" type="password" name="password" required>
+            </div>
+          </div>
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-primary" type="submit">Sign in</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

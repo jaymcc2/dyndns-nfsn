@@ -1,0 +1,17 @@
+{
+  "CHECK_INTERVAL": 300,
+  "ENABLE": false,
+  "HOST_STATUSES": {},
+  "LAST_MESSAGE": "DDNS is disabled; skipping DNS check",
+  "LAST_PUBLIC_IP": null,
+  "LAST_RESULT": "skipped",
+  "LAST_RUN": "2026-08-23 00:10:12 UTC",
+  "LOG_LEVEL": "INFO",
+  "NFSN_API_KEY": "",
+  "NFSN_DOMAIN": "",
+  "NFSN_DOMAINS": "",
+  "NFSN_HOSTNAMES": "",
+  "NFSN_LOGIN": "",
+  "NFSN_SUBDOMAIN": "",
+  "TIME_ZONE": "UTC"
+}

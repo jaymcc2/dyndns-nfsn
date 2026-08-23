@@ -1,0 +1,32 @@
+<section class="hero is-link">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-vcentered is-mobile">
+        <div class="column">
+          <h1 class="title">{{ header_title }}</h1>
+          <h2 class="subtitle">{{ header_subtitle }}</h2>
+        </div>
+        {% if nav_items %}
+          <div class="column is-narrow has-text-right">
+            <nav class="navbar" role="navigation" aria-label="header navigation">
+              <div class="navbar-brand">
+                <a id="burgerToggle" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </a>
+              </div>
+              <div id="navMenu" class="navbar-menu">
+                <div class="navbar-end">
+                  {% for item in nav_items %}
+                    <a class="navbar-item {% if request.path == item.href %}is-active{% endif %}" href="{{ item.href }}">{{ item.label }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            </nav>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

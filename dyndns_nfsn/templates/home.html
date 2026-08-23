@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}dyndns_nfsn | NearlyFreeSpeech.net DNS{% endblock %}
+
+{% block body %}
+{% set header_title = 'dyndns_nfsn' %}
+{% set header_subtitle = 'Manage NearlyFreeSpeech.net DNS records for your TrueNAS host.' %}
+{% set nav_items = [
+  {'label': 'Home', 'href': url_for('home')},
+  {'label': 'Logs', 'href': url_for('logs')},
+  {'label': 'Settings', 'href': url_for('settings')},
+  {'label': 'Logout', 'href': url_for('logout')}
+] %}
+{% include 'partials/header.html' %}
+
+<main class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        
+        <div class="notification is-info">
+          <strong>Status:</strong> {{ settings.LAST_RESULT|default('unknown') }}<br>
+          {{ settings.LAST_MESSAGE|default('No status available.') }}
+        </div>
+        <div class="box mb-4">
+        <h3 class="title is-4">Service status</h3>
+          <div class="columns is-multiline">
+            <div class="column is-one-third">
+              <p class="subtitle is-6">Enabled</p>
+              <p>{{ 'Yes' if settings.ENABLE else 'No' }}</p>
+            </div>
+            <div class="column is-one-third">
+              <p class="subtitle is-6">Last run</p>
+              <p>{{ settings.LAST_RUN or 'never' }}</p>
+            </div>
+            <div class="column is-one-third">
+              <p class="subtitle is-6">Public IP</p>
+              <p>{{ settings.LAST_PUBLIC_IP or 'unknown' }}</p>
+            </div>
+          </div>
+        </div>
+
+        {% if settings.HOST_STATUSES %}
+          <div class="box mt-4">
+              <h4 class="title is-5">Host statuses</h4>
+              <div class="table-container">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                  <thead>
+                    <tr>
+                      <th>Hostname</th>
+                      <th>DNS IP</th>
+                      <th>Result</th>
+                      <th>Message</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for hostname, info in settings.HOST_STATUSES.items() %}
+                      <tr>
+                        <td>{{ hostname }}</td>
+                        <td>{{ info.dns_ip or 'unknown' }}</td>
+                        <td>{{ info.status }}</td>
+                        <td>{{ info.message }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {% endif %}
+
+          <form method="post" action="{{ url_for('run_now') }}">
+            <button type="submit" class="button is-primary" {% if not settings.ENABLE %}disabled{% endif %}>
+              Update Now
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

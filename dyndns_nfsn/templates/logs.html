@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}dyndns_nfsn Logs{% endblock %}
+
+{% block body %}
+{% set header_title = 'Logs' %}
+{% set header_subtitle = 'View and manage the dyndns_nfsn log file.' %}
+{% set nav_items = [
+  {'label': 'Home', 'href': url_for('home')},
+  {'label': 'Logs', 'href': url_for('logs')},
+  {'label': 'Settings', 'href': url_for('settings')},
+  {'label': 'Logout', 'href': url_for('logout')}
+] %}
+{% include 'partials/header.html' %}
+
+<main class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <div class="field">
+          <label class="label">Log file</label>
+          <div class="control">
+            <textarea class="textarea is-family-monospace" rows="25" readonly>{{ log_contents }}</textarea>
+          </div>
+        </div>
+
+        <form method="post" action="{{ url_for('clear_logs') }}">
+          <button type="submit" class="button is-danger">Clear log file</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

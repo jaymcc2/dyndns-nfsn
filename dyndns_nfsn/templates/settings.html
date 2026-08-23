@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}dyndns_nfsn Settings{% endblock %}
+
+{% block body %}
+{% set header_title = 'dyndns_nfsn Settings' %}
+{% set header_subtitle = 'Edit only the values needed to manage your NearlyFreeSpeech.net DNS service.' %}
+{% set nav_items = [
+  {'label': 'Home', 'href': url_for('home')},
+  {'label': 'Logs', 'href': url_for('logs')},
+  {'label': 'Settings', 'href': url_for('settings')},
+  {'label': 'Logout', 'href': url_for('logout')}
+] %}
+{% include 'partials/header.html' %}
+
+<main class="section">
+  <div class="container is-max-desktop">
+    <div class="card">
+      <div class="card-content">
+        <form method="post" action="{{ url_for('save_settings_route') }}">
+          {% for key in editable_settings if key not in hidden_editable_settings %}
+            {% if key == 'ENABLE' %}
+              <div class="field">
+                <label class="label">Enabled</label>
+                <div class="control">
+                  <label class="radio">
+                    <input type="radio" name="ENABLE" value="true" {% if settings.ENABLE %}checked{% endif %}>
+                    Yes
+                  </label>
+                  <label class="radio">
+                    <input type="radio" name="ENABLE" value="false" {% if not settings.ENABLE %}checked{% endif %}>
+                    No
+                  </label>
+                </div>
+              </div>
+            {% elif key == 'NFSN_DOMAINS' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">Domains</label>
+                <div class="control">
+                  <textarea class="textarea" id="{{ key }}" name="{{ key }}" rows="4">{{ settings[key] }}</textarea>
+                </div>
+                <p class="help">Enter full domains as a CSV list or one per line. Each domain will be updated with the public IP.</p>
+              </div>
+            {% elif key == 'NFSN_API_KEY' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">NFSN API Key</label>
+                <div class="control">
+                  <input class="input" id="{{ key }}" name="{{ key }}" type="password" value="" placeholder="Leave blank to keep existing key">
+                </div>
+              </div>
+            {% elif key == 'LOG_LEVEL' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">Log Level</label>
+                <div class="control">
+                  <div class="select is-fullwidth">
+                    <select id="{{ key }}" name="{{ key }}">
+                      {% for level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] %}
+                        <option value="{{ level }}" {% if settings[key] == level %}selected{% endif %}>{{ level }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            {% elif key == 'TIME_ZONE' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">Time Zone</label>
+                <div class="control">
+                  <div class="select is-fullwidth">
+                    <select id="{{ key }}" name="{{ key }}">
+                      {% for tz in time_zones %}
+                        <option value="{{ tz }}" {% if settings[key] == tz %}selected{% endif %}>{{ tz }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <div class="field">
+                <label class="label" for="{{ key }}">{{ key }}</label>
+                <div class="control">
+                  <input class="input" id="{{ key }}" name="{{ key }}" type="{{ 'password' if key == 'NFSN_API_KEY' else 'number' if key == 'CHECK_INTERVAL' else 'text' }}" value="{{ settings[key] }}">
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+
+          <div class="field is-grouped">
+            <div class="control">
+              <button type="submit" class="button is-primary">Save</button>
+            </div>
+            <div class="control">
+              <a class="button is-light" href="{{ url_for('home') }}">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
