@@ -27,17 +27,15 @@ class TestJsonSettingsAndManagementApp(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             settings_path = Path(temp_dir) / 'settings.json'
             settings = module.load_settings(str(settings_path))
-            self.assertIn('NFSN_DOMAIN', settings)
+            self.assertIn('NFSN_DOMAINS', settings)
 
-            settings['NFSN_DOMAIN'] = 'example.com'
-            settings['NFSN_SUBDOMAIN'] = 'home'
+            settings['NFSN_DOMAINS'] = 'example.com'
             settings['NFSN_LOGIN'] = 'user'
             settings['NFSN_API_KEY'] = 'secret'
             module.save_settings(settings, str(settings_path))
 
             saved = json.loads(settings_path.read_text())
-            self.assertEqual(saved['NFSN_DOMAIN'], 'example.com')
-            self.assertEqual(saved['NFSN_SUBDOMAIN'], 'home')
+            self.assertEqual(saved['NFSN_DOMAINS'], 'example.com')
             self.assertEqual(saved['NFSN_LOGIN'], 'user')
             self.assertEqual(saved['NFSN_API_KEY'], 'secret')
 
@@ -65,8 +63,7 @@ class TestJsonSettingsAndManagementApp(unittest.TestCase):
             response = client.post(
                 '/settings',
                 data={
-                    'NFSN_DOMAIN': 'example.com',
-                    'NFSN_SUBDOMAIN': 'home',
+                    'NFSN_DOMAINS': 'example.com',
                     'NFSN_LOGIN': 'user',
                     'NFSN_API_KEY': 'secret',
                     'CHECK_INTERVAL': '300',
@@ -77,8 +74,7 @@ class TestJsonSettingsAndManagementApp(unittest.TestCase):
 
             self.assertIn(response.status_code, (200, 302))
             saved = json.loads(settings_path.read_text())
-            self.assertEqual(saved['NFSN_DOMAIN'], 'example.com')
-            self.assertEqual(saved['NFSN_SUBDOMAIN'], 'home')
+            self.assertEqual(saved['NFSN_DOMAINS'], 'example.com')
             self.assertEqual(saved['NFSN_LOGIN'], 'user')
             self.assertEqual(saved['NFSN_API_KEY'], 'secret')
 

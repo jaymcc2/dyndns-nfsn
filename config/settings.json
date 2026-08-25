@@ -1,17 +1,21 @@
 {
   "CHECK_INTERVAL": 300,
-  "ENABLE": false,
-  "HOST_STATUSES": {},
-  "LAST_MESSAGE": "DDNS is disabled; skipping DNS check",
-  "LAST_PUBLIC_IP": null,
-  "LAST_RESULT": "skipped",
-  "LAST_RUN": "2026-08-23 00:10:12 UTC",
+  "ENABLE": true,
+  "HOST_STATUSES": {
+    "hewn.info": {
+      "dns_ip": null,
+      "message": "Local clock is -140s from NFSN's, which exceeds their 5s tolerance. Sync your clock (NTP) and retry. Server said: The API request could not be authenticated. | The authentication timestamp is more than five seconds off. Please check your system clock.",
+      "status": "failure"
+    }
+  },
+  "LAST_MESSAGE": "Public IP unchanged; DNS verification not required",
+  "LAST_PUBLIC_IP": "47.163.38.194",
+  "LAST_PUBLIC_IP_UPDATED": "2026-08-24T21:25:04-0500",
+  "LAST_RESULT": "current",
+  "LAST_RUN": "2026-08-24 21:28:25 CDT",
   "LOG_LEVEL": "INFO",
-  "NFSN_API_KEY": "",
-  "NFSN_DOMAIN": "",
-  "NFSN_DOMAINS": "",
-  "NFSN_HOSTNAMES": "",
-  "NFSN_LOGIN": "",
-  "NFSN_SUBDOMAIN": "",
-  "TIME_ZONE": "UTC"
+  "NFSN_API_KEY": "lvcq9M2RihmeW0A3",
+  "NFSN_DOMAINS": "hewn.info",
+  "NFSN_LOGIN": "jaym",
+  "TIME_ZONE": "America/Chicago"
 }

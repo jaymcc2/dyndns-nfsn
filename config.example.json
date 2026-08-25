@@ -1,0 +1,15 @@
+{
+  "ENABLE": false,
+  "NFSN_DOMAINS": "example.com",
+  "NFSN_LOGIN": "your-nfsn-login",
+  "NFSN_API_KEY": "your-nfsn-api-key",
+  "CHECK_INTERVAL": 300,
+  "LOG_LEVEL": "INFO",
+  "TIME_ZONE": "UTC",
+  "LAST_RUN": null,
+  "LAST_RESULT": "never",
+  "LAST_MESSAGE": "No DDNS checks have run yet.",
+  "LAST_PUBLIC_IP": null,
+  "LAST_PUBLIC_IP_UPDATED": null,
+  "HOST_STATUSES": {}
+}

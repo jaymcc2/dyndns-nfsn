@@ -28,16 +28,29 @@ def get_time_zones() -> list[str]:
         return ["UTC"]
 
 
+TIMESTAMP_ISO_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
+
+
 def format_timestamp(time_zone: str | None = None, fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     return datetime.now(tz=get_time_zone(time_zone)).strftime(fmt)
 
 
+def current_timestamp(time_zone: str | None = None) -> str:
+    return datetime.now(tz=get_time_zone(time_zone)).strftime(TIMESTAMP_ISO_FORMAT)
+
+
+def parse_timestamp(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError:
+        return None
+
+
 DEFAULT_SETTINGS = {
     "ENABLE": False,
-    "NFSN_DOMAIN": "",
-    "NFSN_SUBDOMAIN": "",
     "NFSN_DOMAINS": "",
-    "NFSN_HOSTNAMES": "",
     "NFSN_LOGIN": "",
     "NFSN_API_KEY": "",
     "CHECK_INTERVAL": 300,
@@ -47,23 +60,19 @@ DEFAULT_SETTINGS = {
     "LAST_RESULT": "never",
     "LAST_MESSAGE": "No DDNS checks have run yet.",
     "LAST_PUBLIC_IP": None,
+    "LAST_PUBLIC_IP_UPDATED": None,
     "HOST_STATUSES": {},
 }
 
 EDITABLE_SETTINGS = [
     "ENABLE",
     "NFSN_DOMAINS",
-    "NFSN_DOMAIN",
-    "NFSN_SUBDOMAIN",
-    "NFSN_HOSTNAMES",
     "NFSN_LOGIN",
     "NFSN_API_KEY",
     "CHECK_INTERVAL",
     "LOG_LEVEL",
     "TIME_ZONE",
 ]
-
-HIDDEN_EDITABLE_SETTINGS = {"NFSN_DOMAIN", "NFSN_SUBDOMAIN", "NFSN_HOSTNAMES"}
 
 
 def get_settings_path(config_path: str | None = None) -> str:

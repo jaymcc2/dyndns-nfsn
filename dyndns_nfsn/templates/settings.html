@@ -18,7 +18,7 @@
     <div class="card">
       <div class="card-content">
         <form method="post" action="{{ url_for('save_settings_route') }}">
-          {% for key in editable_settings if key not in hidden_editable_settings %}
+          {% for key in editable_settings %}
             {% if key == 'ENABLE' %}
               <div class="field">
                 <label class="label">Enabled</label>
@@ -72,6 +72,20 @@
                       {% endfor %}
                     </select>
                   </div>
+                </div>
+              </div>
+            {% elif key == 'NFSN_LOGIN' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">NFSN Login</label>
+                <div class="control">
+                  <input class="input" id="{{ key }}" name="{{ key }}" type="text" value="{{ settings[key] }}">
+                </div>
+              </div>
+            {% elif key == 'CHECK_INTERVAL' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">Check Interval</label>
+                <div class="control">
+                  <input class="input" id="{{ key }}" name="{{ key }}" type="number" value="{{ settings[key] }}">
                 </div>
               </div>
             {% else %}

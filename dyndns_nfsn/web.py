@@ -7,7 +7,6 @@ from .auth import get_admin_credentials, login_required
 from .config import (
     DEFAULT_SETTINGS,
     EDITABLE_SETTINGS,
-    HIDDEN_EDITABLE_SETTINGS,
     format_timestamp,
     get_flask_secret_key,
     get_settings_path,
@@ -104,7 +103,6 @@ def create_app(config_path: str | None = None) -> Flask:
             "settings.html",
             settings=settings,
             editable_settings=EDITABLE_SETTINGS,
-            hidden_editable_settings=HIDDEN_EDITABLE_SETTINGS,
             time_zones=get_time_zones(),
         )
 
@@ -134,7 +132,7 @@ def create_app(config_path: str | None = None) -> Flask:
         settings = load_settings(app.config["SETTINGS_PATH"])
         configure_logging(settings)
         try:
-            check_and_update(settings, app.config["SETTINGS_PATH"])
+            check_and_update(settings, app.config["SETTINGS_PATH"], force_remote_dns=True)
         except Exception as exc:
             settings["LAST_RESULT"] = "failure"
             settings["LAST_MESSAGE"] = str(exc)

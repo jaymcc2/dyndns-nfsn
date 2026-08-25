@@ -1,12 +1,19 @@
 import logging
-import time
+from datetime import datetime
 
 import requests
 from nfsn_cli import Nfsn, NfsnTransport
 from nfsn_cli.config import Credentials
 from nfsn_cli.resources import Record
 
-from .config import format_timestamp, load_settings, save_settings
+from .config import (
+    current_timestamp,
+    format_timestamp,
+    get_time_zone,
+    load_settings,
+    parse_timestamp,
+    save_settings,
+)
 
 log = logging.getLogger("ddns")
 IPIFY_URL = "https://api.ipify.org"
@@ -14,8 +21,6 @@ IPIFY_URL = "https://api.ipify.org"
 
 def parse_domains(settings: dict) -> list[str]:
     raw = str(settings.get("NFSN_DOMAINS", "") or "").strip()
-    if not raw:
-        raw = str(settings.get("NFSN_HOSTNAMES", "") or "").strip()
 
     lines = []
     for part in raw.replace(",", "\n").splitlines():
@@ -78,7 +83,7 @@ def get_public_ip() -> str:
     return ip
 
 
-def check_and_update(settings: dict | None = None, config_path: str | None = None) -> None:
+def check_and_update(settings: dict | None = None, config_path: str | None = None, force_remote_dns: bool = False) -> None:
     settings = settings or load_settings(config_path)
 
     if not settings.get("ENABLE", True):
@@ -111,10 +116,45 @@ def check_and_update(settings: dict | None = None, config_path: str | None = Non
         return
 
     public_ip = get_public_ip()
+    previous_public_ip = settings.get("LAST_PUBLIC_IP")
+    last_updated = parse_timestamp(settings.get("LAST_PUBLIC_IP_UPDATED"))
+    now_timestamp = current_timestamp(settings.get("TIME_ZONE"))
     log.info("Starting DNS check; public IP=%s", public_ip)
     host_statuses = {}
     overall_status = "current"
     error_messages = []
+
+    should_verify_dns = force_remote_dns
+    if public_ip != previous_public_ip:
+        log.info("Public IP has changed from %s to %s", previous_public_ip, public_ip)
+        should_verify_dns = True
+    else:
+        if force_remote_dns:
+            should_verify_dns = True
+            log.info("Force remote DNS verification requested")
+        elif last_updated is None:
+            should_verify_dns = True
+            log.info("No previous public IP update timestamp found; verifying DNS")
+        else:
+            age = datetime.now(tz=get_time_zone(settings.get("TIME_ZONE"))) - last_updated
+            if age.total_seconds() > 24 * 3600:
+                should_verify_dns = True
+                log.info("Public IP last updated %s ago; verifying DNS", age)
+            else:
+                log.info("Public IP unchanged and last updated %s ago; skipping DNS verification", age)
+
+    if public_ip != previous_public_ip:
+        settings["LAST_PUBLIC_IP"] = public_ip
+
+    if should_verify_dns:
+        settings["LAST_PUBLIC_IP_UPDATED"] = now_timestamp
+
+    if public_ip == previous_public_ip and not should_verify_dns:
+        settings["LAST_RESULT"] = "current"
+        settings["LAST_MESSAGE"] = "Public IP unchanged; DNS verification not required"
+        settings["LAST_RUN"] = format_timestamp(settings.get("TIME_ZONE"))
+        save_settings(settings, config_path)
+        return
 
     for domain in domains:
         try:
