@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .env
 config/settings.json
+config/.flask_secret_key
