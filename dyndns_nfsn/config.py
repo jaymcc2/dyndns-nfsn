@@ -54,6 +54,7 @@ DEFAULT_SETTINGS = {
     "NFSN_LOGIN": "",
     "NFSN_API_KEY": "",
     "CHECK_INTERVAL": 300,
+    "FORCED_DNS_CHECK_TIME": "00:00",
     "LOG_LEVEL": "INFO",
     "TIME_ZONE": get_default_time_zone(),
     "LAST_RUN": None,
@@ -70,9 +71,31 @@ EDITABLE_SETTINGS = [
     "NFSN_LOGIN",
     "NFSN_API_KEY",
     "CHECK_INTERVAL",
+    "FORCED_DNS_CHECK_TIME",
     "LOG_LEVEL",
     "TIME_ZONE",
 ]
+
+
+def normalize_forced_dns_check_time(value: str | None) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return DEFAULT_SETTINGS["FORCED_DNS_CHECK_TIME"]
+
+    parts = text.split(":")
+    if len(parts) != 2:
+        return DEFAULT_SETTINGS["FORCED_DNS_CHECK_TIME"]
+
+    try:
+        hours = int(parts[0])
+        minutes = int(parts[1])
+    except ValueError:
+        return DEFAULT_SETTINGS["FORCED_DNS_CHECK_TIME"]
+
+    if not (0 <= hours <= 23 and 0 <= minutes <= 59):
+        return DEFAULT_SETTINGS["FORCED_DNS_CHECK_TIME"]
+
+    return f"{hours:02d}:{minutes:02d}"
 
 
 def get_settings_path(config_path: str | None = None) -> str:
@@ -130,6 +153,10 @@ def load_settings(config_path: str | None = None) -> dict:
     if not str(merged.get("LOG_LEVEL", "")).strip():
         merged["LOG_LEVEL"] = DEFAULT_SETTINGS["LOG_LEVEL"]
 
+    merged["FORCED_DNS_CHECK_TIME"] = normalize_forced_dns_check_time(
+        merged.get("FORCED_DNS_CHECK_TIME", DEFAULT_SETTINGS["FORCED_DNS_CHECK_TIME"])
+    )
+
     if not str(merged.get("TIME_ZONE", "")).strip():
         merged["TIME_ZONE"] = DEFAULT_SETTINGS["TIME_ZONE"]
     elif str(merged.get("TIME_ZONE", "")).strip() not in get_time_zones():
@@ -158,6 +185,10 @@ def save_settings(settings: dict, config_path: str | None = None) -> None:
 
     if not str(sanitized.get("LOG_LEVEL", "")).strip():
         sanitized["LOG_LEVEL"] = DEFAULT_SETTINGS["LOG_LEVEL"]
+
+    sanitized["FORCED_DNS_CHECK_TIME"] = normalize_forced_dns_check_time(
+        sanitized.get("FORCED_DNS_CHECK_TIME", DEFAULT_SETTINGS["FORCED_DNS_CHECK_TIME"])
+    )
 
     if not str(sanitized.get("TIME_ZONE", "")).strip():
         sanitized["TIME_ZONE"] = DEFAULT_SETTINGS["TIME_ZONE"]

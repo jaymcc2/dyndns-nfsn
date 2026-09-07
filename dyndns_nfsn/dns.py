@@ -119,7 +119,7 @@ def check_and_update(settings: dict | None = None, config_path: str | None = Non
     previous_public_ip = settings.get("LAST_PUBLIC_IP")
     last_updated = parse_timestamp(settings.get("LAST_PUBLIC_IP_UPDATED"))
     now_timestamp = current_timestamp(settings.get("TIME_ZONE"))
-    log.info("Starting DNS check; public IP=%s", public_ip)
+    log.info_plus("Starting DNS check; public IP=%s", public_ip)
     host_statuses = {}
     overall_status = "current"
     error_messages = []
@@ -131,17 +131,17 @@ def check_and_update(settings: dict | None = None, config_path: str | None = Non
     else:
         if force_remote_dns:
             should_verify_dns = True
-            log.info("Force remote DNS verification requested")
+            log.info_plus("Force remote DNS verification requested")
         elif last_updated is None:
             should_verify_dns = True
-            log.info("No previous public IP update timestamp found; verifying DNS")
+            log.info_plus("No previous public IP update timestamp found; verifying DNS")
         else:
             age = datetime.now(tz=get_time_zone(settings.get("TIME_ZONE"))) - last_updated
             if age.total_seconds() > 24 * 3600:
                 should_verify_dns = True
-                log.info("Public IP last updated %s ago; verifying DNS", age)
+                log.info_plus("Public IP last updated %s ago; verifying DNS", age)
             else:
-                log.info("Public IP unchanged and last updated %s ago; skipping DNS verification", age)
+                log.info_plus("Public IP unchanged and last updated %s ago; skipping DNS verification", age)
 
     if public_ip != previous_public_ip:
         settings["LAST_PUBLIC_IP"] = public_ip
@@ -162,14 +162,14 @@ def check_and_update(settings: dict | None = None, config_path: str | None = Non
             if public_ip == current_dns_ip:
                 status = "current"
                 message = "DNS record is current"
-                log.info("%s: %s (dns_ip=%s)", domain, message, current_dns_ip or 'unknown')
+                log.info_plus("%s: %s (dns_ip=%s)", domain, message, current_dns_ip or 'unknown')
             else:
                 update_dns(public_ip, settings, domain)
                 new_dns_ip = get_dns_ip(settings, domain)
                 status = "updated"
                 message = f"Updated DNS from {current_dns_ip or 'unknown'} to {public_ip}"
                 current_dns_ip = new_dns_ip
-                log.info("%s: %s (dns_ip=%s)", domain, message, current_dns_ip or 'unknown')
+                log.info_plus("%s: %s (dns_ip=%s)", domain, message, current_dns_ip or 'unknown')
 
             host_statuses[domain] = {
                 "status": status,

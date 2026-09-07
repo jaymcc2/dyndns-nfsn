@@ -23,6 +23,7 @@ def build_status_payload(settings: dict) -> dict:
         "enabled": bool(settings.get("ENABLE", False)),
         "domains": parse_domains(settings),
         "check_interval": settings.get("CHECK_INTERVAL"),
+        "forced_dns_check_time": settings.get("FORCED_DNS_CHECK_TIME"),
         "log_level": settings.get("LOG_LEVEL"),
         "last_run": settings.get("LAST_RUN"),
         "last_result": settings.get("LAST_RESULT"),

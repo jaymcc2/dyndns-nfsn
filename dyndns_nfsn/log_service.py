@@ -6,6 +6,17 @@ from typing import Optional
 
 from .config import get_time_zone
 
+INFO_PLUS = 25
+logging.addLevelName(INFO_PLUS, "INFO+")
+
+
+def info_plus(self, message, *args, **kwargs):
+    if self.isEnabledFor(INFO_PLUS):
+        self._log(INFO_PLUS, message, args, **kwargs)
+
+
+logging.Logger.info_plus = info_plus
+
 LOG_DIR = "/logs"
 LOG_FILENAME = "dyndns_nfsn.log"
 LOG_PATH = os.path.join(LOG_DIR, LOG_FILENAME)
@@ -34,10 +45,42 @@ def get_log_path() -> str:
     return LOG_PATH
 
 
+def _log_is_from_previous_day(path: str, tz_name: str | None = None) -> bool:
+    if not os.path.exists(path):
+        return False
+
+    tz = get_time_zone(tz_name)
+    modified = datetime.fromtimestamp(os.path.getmtime(path), tz=tz).date()
+    return modified < datetime.now(tz=tz).date()
+
+
+def _rotate_log_files(path: str) -> None:
+    oldest = f"{path}.7"
+    if os.path.exists(oldest):
+        os.remove(oldest)
+
+    for index in range(6, 0, -1):
+        source = f"{path}.{index}"
+        target = f"{path}.{index + 1}"
+        if os.path.exists(source):
+            os.rename(source, target)
+
+    os.rename(path, f"{path}.1")
+
+
 def configure_logging(settings: dict) -> logging.Logger:
     ensure_log_dir()
+    if _log_is_from_previous_day(LOG_PATH, settings.get("TIME_ZONE")):
+        _rotate_log_files(LOG_PATH)
+
     level_name = str(settings.get("LOG_LEVEL", "INFO")).upper()
-    level = logging.getLevelName(level_name)
+    if level_name == "INFO+":
+        level = INFO_PLUS
+    else:
+        level = logging.getLevelName(level_name)
+        if not isinstance(level, int):
+            level = logging.INFO
+
     logger = logging.getLogger("ddns")
     logger.setLevel(level)
     logger.propagate = False
@@ -78,12 +121,5 @@ def rotate_log() -> None:
         open(path, "a", encoding="utf-8").close()
         return
 
-    existing = glob.glob(f"{path}.*")
-    max_index = 0
-    for candidate in existing:
-        suffix = candidate[len(path) + 1 :]
-        if suffix.isdigit():
-            max_index = max(max_index, int(suffix))
-    next_index = max_index + 1
-    os.rename(path, f"{path}.{next_index}")
+    _rotate_log_files(path)
     open(path, "a", encoding="utf-8").close()

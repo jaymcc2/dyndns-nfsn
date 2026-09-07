@@ -54,7 +54,7 @@
                 <div class="control">
                   <div class="select is-fullwidth">
                     <select id="{{ key }}" name="{{ key }}">
-                      {% for level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] %}
+                      {% for level in ["DEBUG", "INFO+", "INFO", "WARNING", "ERROR", "CRITICAL"] %}
                         <option value="{{ level }}" {% if settings[key] == level %}selected{% endif %}>{{ level }}</option>
                       {% endfor %}
                     </select>
@@ -87,6 +87,14 @@
                 <div class="control">
                   <input class="input" id="{{ key }}" name="{{ key }}" type="number" value="{{ settings[key] }}">
                 </div>
+              </div>
+            {% elif key == 'FORCED_DNS_CHECK_TIME' %}
+              <div class="field">
+                <label class="label" for="{{ key }}">Forced DNS Check Time</label>
+                <div class="control">
+                  <input class="input" id="{{ key }}" name="{{ key }}" type="time" value="{{ settings[key] }}">
+                </div>
+                <p class="help">Daily time (based on selected Time Zone) to force remote DNS verification.</p>
               </div>
             {% else %}
               <div class="field">
