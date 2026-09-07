@@ -1,13 +1,12 @@
 services:
   dyndns_nfsn:
-    build: .
     image: ${DYNDNS_IMAGE:-dyndns_nfsn}:${DYNDNS_TAG:-latest}
     container_name: dyndns_nfsn
     restart: unless-stopped
     ports:
       - "56080:80"
     volumes:
-      - ./config:/config
+      - config:/config
       - logs:/logs
     environment:
       SETTINGS_PATH: "/config/settings.json"
@@ -15,4 +14,5 @@ services:
       ADMIN_USERNAME: "admin"
       ADMIN_PASSWORD: "admin"
 volumes:
+  config:
   logs:
